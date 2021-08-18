@@ -1,10 +1,7 @@
-package com.envyful.chest.shop.forge;
+package com.envyful.chest.shop.sponge;
 
 import com.envyful.api.forge.command.ForgeCommandFactory;
 import com.envyful.api.forge.concurrency.ForgeUpdateBuilder;
-import com.envyful.chest.shop.forge.event.NetHandlerPlaySignServer;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -16,7 +13,7 @@ import java.nio.file.Paths;
 
 @Mod(
         modid = "chestshop",
-        name = "ChestShops Forge",
+        name = "ChestShops Sponge",
         version = ChestShopForge.VERSION,
         acceptableRemoteVersions = "*"
 )
@@ -50,7 +47,7 @@ public class ChestShopForge {
 
     @Mod.EventHandler
     public void onServerStarting(FMLServerStartingEvent event) {
-        FMLCommonHandler.instance().getClientToServerNetworkManager()
+
     }
 
     public static ChestShopForge getInstance() {

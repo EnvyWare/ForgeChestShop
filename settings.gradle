@@ -1,3 +1,4 @@
 rootProject.name = 'ForgeChestShop'
 include 'api'
 include 'forge'
+include 'sponge'

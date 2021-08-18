@@ -11,10 +11,12 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.+', changing: true
+        classpath 'gradle.plugin.org.spongepowered:spongegradle:0.8.1'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.plugin'
 
 minecraft {
     mappings channel: 'snapshot', version: '20180814-1.12'
@@ -37,6 +39,7 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+    compileOnly 'org.spongepowered:spongeforge:1.12.2-2838-7.1.8:dev'
     compileOnly ('com.pixelmonmod.pixelmon:Pixelmon-1.12.2-8.2.0-server:1.0')
 
     shadow group: 'org.spongepowered', name: 'configurate-yaml', version: '4.0.0'
