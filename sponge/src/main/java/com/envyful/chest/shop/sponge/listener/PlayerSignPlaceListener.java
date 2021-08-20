@@ -18,7 +18,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class PlayerSignPlaceListener {
 
@@ -38,7 +40,8 @@ public class PlayerSignPlaceListener {
 
     @Listener
     public void onSignEdit(ChangeSignEvent event, @Root Player player) {
-        if (!this.isShopSign(event) || event.getText().lines().size() != 4) {
+        if (!this.doesOwn((EntityPlayerMP) player, event.getTargetTile().getLocation()) ||
+                !this.isShopSign(event) || event.getText().lines().size() != 4) {
             return;
         }
 
@@ -119,5 +122,18 @@ public class PlayerSignPlaceListener {
         tileEntity.getTileData().setInteger(SHOP_AMOUNT_NBT, amount);
         tileEntity.getTileData().setString(SHOP_ITEM_NBT, itemStack.getItem().getRegistryName() + ":" + itemStack.getItemDamage());
         tileEntity.getTileData().setBoolean(SHOP_TYPE_NBT, buySign);
+    }
+
+    private boolean doesOwn(EntityPlayerMP player, Location<World> location) {
+        net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
+                .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        String ownerUuid = tileEntity.getTileData().getString(PlayerSignPlaceListener.SHOP_NBT);
+
+        if (ownerUuid.isEmpty()) {
+            return true;
+        }
+
+        UUID owner = UUID.fromString(ownerUuid);
+        return Objects.equals(player.getUniqueID(), owner);
     }
 }
