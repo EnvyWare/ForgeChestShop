@@ -80,8 +80,8 @@ public class PlayerSignInteractListener {
             IPixelmonBankAccount interacterBank = Pixelmon.moneyManager.getBankAccount(player.getUniqueId()).get();
             SignData signData = targetBlock.getLocation().get().getTileEntity().get().get(SignData.class).get();
             ItemStack item = this.getSignItem(signData);
-            int signAmount = this.getSignAmount(signData);
-            int transactionWorth = this.getSignWorthPer(signData);
+            int signAmount = this.getSignAmount((EntityPlayerMP) player, targetBlock.getLocation().get());
+            double transactionWorth = this.getSignWorthPer((EntityPlayerMP) player, targetBlock.getLocation().get());
             boolean buySign = this.getSignType(signData);
             Chest chest = (Chest) UtilBlock.getPlacedOn(targetBlock.getLocation().get(), BlockTypes.CHEST).getLocation().getTileEntity().get();
             Player ownerPlayer = Sponge.getServer().getPlayer(owner).orElse(null);
@@ -122,8 +122,8 @@ public class PlayerSignInteractListener {
                 }
 
                 player.sendMessage(PURCHASED_ITEMS);
-                interacterBank.changeMoney(-transactionWorth);
-                ownerBank.changeMoney(transactionWorth);
+                interacterBank.changeMoney((int) -transactionWorth);
+                ownerBank.changeMoney((int) transactionWorth);
             } else {
                 if (transactionWorth > ownerBank.getMoney()) {
                     player.sendMessage(INSUFFICIENT_DEALER_FUNDS);
@@ -155,8 +155,8 @@ public class PlayerSignInteractListener {
                 }
 
                 player.sendMessage(SOLD_ITEMS);
-                interacterBank.changeMoney(transactionWorth);
-                ownerBank.changeMoney(-transactionWorth);
+                interacterBank.changeMoney((int) transactionWorth);
+                ownerBank.changeMoney((int) -transactionWorth);
             }
         });
     }
@@ -182,12 +182,26 @@ public class PlayerSignInteractListener {
         return ItemStackUtil.fromNative(itemStack);
     }
 
-    private int getSignAmount(SignData signData) {
-        return UtilParse.parseInteger(signData.getListValue().get(1).toPlainSingle()).orElse(-1);
+    private int getSignAmount(EntityPlayerMP player, Location<World> location) {
+        net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
+                .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+        if (tileEntity == null) {
+            return 0;
+        }
+
+        return tileEntity.getTileData().getInteger(PlayerSignPlaceListener.SHOP_AMOUNT_NBT);
     }
 
-    private int getSignWorthPer(SignData signData) {
-        return UtilParse.parseInteger(signData.getListValue().get(2).toPlainSingle().split(" ")[1]).orElse(-1);
+    private double getSignWorthPer(EntityPlayerMP player, Location<World> location) {
+        net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
+                .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+        if (tileEntity == null) {
+            return 0.0;
+        }
+
+        return tileEntity.getTileData().getDouble(PlayerSignPlaceListener.SHOP_PRICE_NBT);
     }
 
     public boolean getSignType(SignData signData) {

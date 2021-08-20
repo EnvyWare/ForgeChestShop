@@ -24,6 +24,8 @@ public class PlayerSignPlaceListener {
 
     public static final DataQuery SHOP_QUERY = DataQuery.of("chestshop", "owner");
     public static final String SHOP_NBT = "CHEST_SHOP_OWNER";
+    public static final String SHOP_PRICE_NBT = "CHEST_SHOP_PRICE";
+    public static final String SHOP_AMOUNT_NBT = "CHEST_SHOP_AMOUNT";
 
     private static final Set<String> SIGN_TYPES = Sets.newHashSet("b", "s");
 
@@ -91,15 +93,15 @@ public class PlayerSignPlaceListener {
             event.getText().setElement(3, Text.of(""));
         }
 
-        this.setOwner(block.getLocation(), (EntityPlayerMP) player);
-        this.setOwner(event.getTargetTile().getLocation(), (EntityPlayerMP) player);
+        this.setNBT(block.getLocation(), price, amount, (EntityPlayerMP) player);
+        this.setNBT(event.getTargetTile().getLocation(), price, amount, (EntityPlayerMP) player);
     }
 
     private boolean isShopSign(ChangeSignEvent event) {
         return event.getText().get(0).orElse(Text.EMPTY).toPlainSingle().equals("[shop]");
     }
 
-    private void setOwner(Location<World> location, EntityPlayerMP player) {
+    private void setNBT(Location<World> location, double price, int amount, EntityPlayerMP player) {
         net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
                 .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
@@ -108,5 +110,7 @@ public class PlayerSignPlaceListener {
         }
 
         tileEntity.getTileData().setString(SHOP_NBT, player.getUniqueID().toString());
+        tileEntity.getTileData().setDouble(SHOP_PRICE_NBT, price);
+        tileEntity.getTileData().setDouble(SHOP_AMOUNT_NBT, amount);
     }
 }
