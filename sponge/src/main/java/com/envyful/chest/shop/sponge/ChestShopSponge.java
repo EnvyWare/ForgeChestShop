@@ -28,11 +28,6 @@ public class ChestShopSponge {
 
     private static ChestShopSponge instance;
 
-    @Inject private Logger logger;
-    @Inject private Game game;
-    @Inject private PluginContainer container;
-
-
     @Listener
     public void onInitialize(GameInitializationEvent event) {
         instance = this;
@@ -49,17 +44,5 @@ public class ChestShopSponge {
                 .repo("ForgeChestShop")
                 .version(VERSION)
                 .start();
-    }
-
-    public Logger getLogger() {
-        return this.logger;
-    }
-
-    public Game getGame() {
-        return this.game;
-    }
-
-    public PluginContainer getContainer() {
-        return this.container;
     }
 }

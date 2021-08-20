@@ -75,7 +75,21 @@ public class PlayerSignPlaceListener {
         }
 
         player.sendMessage(SUCCESSFUL_CREATION);
-        event.getText().setElement(0, Text.of("§f" + player.getName() + "'s Shop"));
+        event.getText().setElement(0, Text.of(player.getName() + "'s Shop"));
+        event.getText().setElement(1, Text.of(
+                (thirdLineArgs[0].equalsIgnoreCase("b") ? "Buy " : "Sell ") + amount
+                        + " for $" + price)
+        );
+
+        String name = type.getDisplayName();
+
+        if (name.length() > 15) {
+            event.getText().setElement(2, Text.of(name.substring(0, 16)));
+            event.getText().setElement(3, Text.of(name.substring(16)));
+        } else {
+            event.getText().setElement(2, Text.of(name));
+            event.getText().setElement(3, Text.of(""));
+        }
 
         this.setOwner(block.getLocation(), (EntityPlayerMP) player);
         this.setOwner(event.getTargetTile().getLocation(), (EntityPlayerMP) player);
