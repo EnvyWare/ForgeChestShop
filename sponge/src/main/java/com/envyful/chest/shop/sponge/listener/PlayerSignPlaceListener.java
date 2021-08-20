@@ -1,6 +1,8 @@
 package com.envyful.chest.shop.sponge.listener;
 
+import com.envyful.api.forge.chat.UtilChatColour;
 import com.envyful.api.type.UtilParse;
+import com.envyful.chest.shop.sponge.ChestShopSponge;
 import com.envyful.chest.shop.sponge.util.UtilBlock;
 import com.envyful.chest.shop.sponge.util.UtilItemStack;
 import com.google.common.collect.Sets;
@@ -37,6 +39,12 @@ public class PlayerSignPlaceListener {
     private static final Text INVALID_PRICE = Text.of("§c§l(!) §cPrice must be valid!");
     private static final Text INVALID_AMOUNT = Text.of("§c§l(!) §cAmount must be valid!");
     private static final Text SUCCESSFUL_CREATION = Text.of("§e§l(!) §eSuccessfully created a shop sign!");
+
+    private final ChestShopSponge mod;
+
+    public PlayerSignPlaceListener(ChestShopSponge mod) {
+        this.mod = mod;
+    }
 
     @Listener
     public void onSignEdit(ChangeSignEvent event, @Root Player player) {
@@ -84,20 +92,18 @@ public class PlayerSignPlaceListener {
         boolean buySign = thirdLineArgs[0].equalsIgnoreCase("b");
 
         player.sendMessage(SUCCESSFUL_CREATION);
-        event.getText().setElement(0, Text.of(player.getName() + "'s Shop"));
-        event.getText().setElement(1, Text.of(
-                (buySign ? "Buy " : "Sell ") + amount
-                        + " for $" + price)
-        );
 
         String name = type.getDisplayName();
 
-        if (name.length() > 15) {
-            event.getText().setElement(2, Text.of(name.substring(0, 16)));
-            event.getText().setElement(3, Text.of(name.substring(16)));
-        } else {
-            event.getText().setElement(2, Text.of(name));
-            event.getText().setElement(3, Text.of(""));
+        for (int i = 0; i < this.mod.getConfig().getSignLines().size(); i++) {
+            event.getText().setElement(i, Text.of(UtilChatColour.translateColourCodes('&',
+                    this.mod.getConfig().getSignLines().get(i)
+                            .replace("%player%", player.getName())
+                            .replace("%signtype%", buySign ? "Buy" : "Sell")
+                            .replace("%amount%", amount + "")
+                            .replace("%price%", price + "")
+                            .replace("%itemname_lineone%", name.length() > 15 ? name.substring(0, 16) : name)
+                            .replace("%itemname_linetwo%", name.length() > 15 ? name.substring(16) : ""))));
         }
 
         this.setNBT(block.getLocation(), buySign, type, price, amount, (EntityPlayerMP) player);

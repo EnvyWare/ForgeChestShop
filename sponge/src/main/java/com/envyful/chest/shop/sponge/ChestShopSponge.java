@@ -1,20 +1,18 @@
 package com.envyful.chest.shop.sponge;
 
+import com.envyful.api.config.yaml.YamlConfigFactory;
 import com.envyful.api.forge.concurrency.ForgeUpdateBuilder;
+import com.envyful.chest.shop.sponge.config.ChestShopConfig;
 import com.envyful.chest.shop.sponge.listener.PlayerChestOpenListener;
 import com.envyful.chest.shop.sponge.listener.PlayerSignBreakListener;
 import com.envyful.chest.shop.sponge.listener.PlayerSignInteractListener;
 import com.envyful.chest.shop.sponge.listener.PlayerSignPlaceListener;
-import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
+
+import java.io.IOException;
 
 @Plugin(
         id = "chestshop",
@@ -28,14 +26,18 @@ public class ChestShopSponge {
 
     private static ChestShopSponge instance;
 
+    private ChestShopConfig config;
+
     @Listener
     public void onInitialize(GameInitializationEvent event) {
         instance = this;
 
+        this.loadConfig();
+
         Sponge.getEventManager().registerListeners(this, new PlayerChestOpenListener());
         Sponge.getEventManager().registerListeners(this, new PlayerSignBreakListener());
         Sponge.getEventManager().registerListeners(this, new PlayerSignInteractListener(this));
-        Sponge.getEventManager().registerListeners(this, new PlayerSignPlaceListener());
+        Sponge.getEventManager().registerListeners(this, new PlayerSignPlaceListener(this));
 
         ForgeUpdateBuilder.instance()
                 .name("ForgeChestShop")
@@ -44,5 +46,17 @@ public class ChestShopSponge {
                 .repo("ForgeChestShop")
                 .version(VERSION)
                 .start();
+    }
+
+    private void loadConfig() {
+        try {
+            this.config = YamlConfigFactory.getInstance(ChestShopConfig.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ChestShopConfig getConfig() {
+        return this.config;
     }
 }
