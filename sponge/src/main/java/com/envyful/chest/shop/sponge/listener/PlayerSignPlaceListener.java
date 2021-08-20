@@ -26,6 +26,8 @@ public class PlayerSignPlaceListener {
     public static final String SHOP_NBT = "CHEST_SHOP_OWNER";
     public static final String SHOP_PRICE_NBT = "CHEST_SHOP_PRICE";
     public static final String SHOP_AMOUNT_NBT = "CHEST_SHOP_AMOUNT";
+    public static final String SHOP_ITEM_NBT = "CHEST_SHOP_ITEM";
+    public static final String SHOP_TYPE_NBT = "CHEST_SHOP_TYPE";
 
     private static final Set<String> SIGN_TYPES = Sets.newHashSet("b", "s");
 
@@ -76,10 +78,12 @@ public class PlayerSignPlaceListener {
             return;
         }
 
+        boolean buySign = thirdLineArgs[0].equalsIgnoreCase("b");
+
         player.sendMessage(SUCCESSFUL_CREATION);
         event.getText().setElement(0, Text.of(player.getName() + "'s Shop"));
         event.getText().setElement(1, Text.of(
-                (thirdLineArgs[0].equalsIgnoreCase("b") ? "Buy " : "Sell ") + amount
+                (buySign ? "Buy " : "Sell ") + amount
                         + " for $" + price)
         );
 
@@ -93,15 +97,16 @@ public class PlayerSignPlaceListener {
             event.getText().setElement(3, Text.of(""));
         }
 
-        this.setNBT(block.getLocation(), price, amount, (EntityPlayerMP) player);
-        this.setNBT(event.getTargetTile().getLocation(), price, amount, (EntityPlayerMP) player);
+        this.setNBT(block.getLocation(), buySign, type, price, amount, (EntityPlayerMP) player);
+        this.setNBT(event.getTargetTile().getLocation(), buySign, type, price, amount, (EntityPlayerMP) player);
     }
 
     private boolean isShopSign(ChangeSignEvent event) {
         return event.getText().get(0).orElse(Text.EMPTY).toPlainSingle().equals("[shop]");
     }
 
-    private void setNBT(Location<World> location, double price, int amount, EntityPlayerMP player) {
+    private void setNBT(Location<World> location, boolean buySign, ItemStack itemStack,
+                        double price, int amount, EntityPlayerMP player) {
         net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
                 .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
@@ -109,8 +114,12 @@ public class PlayerSignPlaceListener {
             return;
         }
 
+        System.out.println(itemStack.getItem().getRegistryName().toString());
+
         tileEntity.getTileData().setString(SHOP_NBT, player.getUniqueID().toString());
         tileEntity.getTileData().setDouble(SHOP_PRICE_NBT, price);
         tileEntity.getTileData().setDouble(SHOP_AMOUNT_NBT, amount);
+        tileEntity.getTileData().setString(SHOP_ITEM_NBT, itemStack.getItem().getRegistryName().toString() + ":" + itemStack.getItemDamage());
+        tileEntity.getTileData().setBoolean(SHOP_TYPE_NBT, buySign);
     }
 }

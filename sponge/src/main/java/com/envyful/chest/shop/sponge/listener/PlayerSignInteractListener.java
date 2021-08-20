@@ -76,13 +76,15 @@ public class PlayerSignInteractListener {
                 return;
             }
 
+            EntityPlayerMP forgePlayer = (EntityPlayerMP) player;
+
             IPixelmonBankAccount ownerBank = bankAccount.get();
             IPixelmonBankAccount interacterBank = Pixelmon.moneyManager.getBankAccount(player.getUniqueId()).get();
             SignData signData = targetBlock.getLocation().get().getTileEntity().get().get(SignData.class).get();
-            ItemStack item = this.getSignItem(signData);
-            int signAmount = this.getSignAmount((EntityPlayerMP) player, targetBlock.getLocation().get());
-            double transactionWorth = this.getSignWorthPer((EntityPlayerMP) player, targetBlock.getLocation().get());
-            boolean buySign = this.getSignType(signData);
+            ItemStack item = this.getSignItem(forgePlayer, targetBlock.getLocation().get());
+            int signAmount = this.getSignAmount(forgePlayer, targetBlock.getLocation().get());
+            double transactionWorth = this.getSignWorthPer(forgePlayer, targetBlock.getLocation().get());
+            boolean buySign = this.getSignType(forgePlayer, targetBlock.getLocation().get());
             Chest chest = (Chest) UtilBlock.getPlacedOn(targetBlock.getLocation().get(), BlockTypes.CHEST).getLocation().getTileEntity().get();
             Player ownerPlayer = Sponge.getServer().getPlayer(owner).orElse(null);
             Inventory chestInventory = chest.getInventory();
@@ -90,7 +92,6 @@ public class PlayerSignInteractListener {
             if (chest.getDoubleChestInventory().isPresent()) {
                 chestInventory = chest.getDoubleChestInventory().get();
             }
-
 
             if (buySign) {
                 if (transactionWorth > interacterBank.getMoney()) {
@@ -172,14 +173,16 @@ public class PlayerSignInteractListener {
         return tileEntity.getTileData().getString(PlayerSignPlaceListener.SHOP_NBT);
     }
 
-    private ItemStack getSignItem(SignData signData) {
-        net.minecraft.item.ItemStack itemStack = UtilItemStack.fromString(signData.get(3).get().toPlainSingle());
+    private ItemStack getSignItem(EntityPlayerMP player, Location<World> location) {
+        net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
+                .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-        if (itemStack == null) {
+        if (tileEntity == null) {
             return null;
         }
 
-        return ItemStackUtil.fromNative(itemStack);
+        return ItemStackUtil.fromNative(
+                UtilItemStack.fromString(tileEntity.getTileData().getString(PlayerSignPlaceListener.SHOP_ITEM_NBT)));
     }
 
     private int getSignAmount(EntityPlayerMP player, Location<World> location) {
@@ -204,8 +207,15 @@ public class PlayerSignInteractListener {
         return tileEntity.getTileData().getDouble(PlayerSignPlaceListener.SHOP_PRICE_NBT);
     }
 
-    public boolean getSignType(SignData signData) {
-        return signData.getListValue().get(2).toPlainSingle().split(" ")[0].equalsIgnoreCase("b");
+    public boolean getSignType(EntityPlayerMP player, Location<World> location) {
+        net.minecraft.tileentity.TileEntity tileEntity = player.getEntityWorld()
+                .getTileEntity(new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+        if (tileEntity == null) {
+            return false;
+        }
+
+        return tileEntity.getTileData().getBoolean(PlayerSignPlaceListener.SHOP_TYPE_NBT);
     }
 
     private TileEntityChest getChest(Location<World> location, EntityPlayerMP player) {
