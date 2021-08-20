@@ -1,7 +1,6 @@
 package com.envyful.chest.shop.sponge.listener;
 
 import com.envyful.api.concurrency.UtilConcurrency;
-import com.envyful.api.type.UtilParse;
 import com.envyful.chest.shop.sponge.ChestShopSponge;
 import com.envyful.chest.shop.sponge.util.UtilBlock;
 import com.envyful.chest.shop.sponge.util.UtilItemStack;
@@ -14,7 +13,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.Chest;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -80,7 +78,6 @@ public class PlayerSignInteractListener {
 
             IPixelmonBankAccount ownerBank = bankAccount.get();
             IPixelmonBankAccount interacterBank = Pixelmon.moneyManager.getBankAccount(player.getUniqueId()).get();
-            SignData signData = targetBlock.getLocation().get().getTileEntity().get().get(SignData.class).get();
             ItemStack item = this.getSignItem(forgePlayer, targetBlock.getLocation().get());
             int signAmount = this.getSignAmount(forgePlayer, targetBlock.getLocation().get());
             double transactionWorth = this.getSignWorthPer(forgePlayer, targetBlock.getLocation().get());
@@ -181,8 +178,9 @@ public class PlayerSignInteractListener {
             return null;
         }
 
-        return ItemStackUtil.fromNative(
-                UtilItemStack.fromString(tileEntity.getTileData().getString(PlayerSignPlaceListener.SHOP_ITEM_NBT)));
+        net.minecraft.item.ItemStack itemStack = UtilItemStack.fromString(tileEntity.getTileData().getString(PlayerSignPlaceListener.SHOP_ITEM_NBT));
+
+        return ItemStackUtil.fromNative(itemStack);
     }
 
     private int getSignAmount(EntityPlayerMP player, Location<World> location) {

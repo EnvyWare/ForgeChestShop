@@ -114,12 +114,10 @@ public class PlayerSignPlaceListener {
             return;
         }
 
-        System.out.println(itemStack.getItem().getRegistryName().toString());
-
         tileEntity.getTileData().setString(SHOP_NBT, player.getUniqueID().toString());
         tileEntity.getTileData().setDouble(SHOP_PRICE_NBT, price);
-        tileEntity.getTileData().setDouble(SHOP_AMOUNT_NBT, amount);
-        tileEntity.getTileData().setString(SHOP_ITEM_NBT, itemStack.getItem().getRegistryName().toString() + ":" + itemStack.getItemDamage());
+        tileEntity.getTileData().setInteger(SHOP_AMOUNT_NBT, amount);
+        tileEntity.getTileData().setString(SHOP_ITEM_NBT, itemStack.getItem().getRegistryName() + ":" + itemStack.getItemDamage());
         tileEntity.getTileData().setBoolean(SHOP_TYPE_NBT, buySign);
     }
 }

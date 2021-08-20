@@ -1,6 +1,5 @@
 package com.envyful.chest.shop.sponge.util;
 
-import com.envyful.api.forge.items.ItemBuilder;
 import com.envyful.api.type.UtilParse;
 import com.google.common.collect.Lists;
 import com.pixelmonmod.pixelmon.items.PixelmonItem;
@@ -45,7 +44,8 @@ public class UtilItemStack {
             Optional<Integer> data = UtilParse.parseInteger(arguments[arguments.length - 1]);
 
             if (data.isPresent()) {
-                return new ItemBuilder().type(item).damage(data.get()).build();
+
+                return new ItemStack(item, 1, data.get());
             }
         }
 
