@@ -26,6 +26,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -96,8 +97,9 @@ public class PlayerSignInteractListener {
                     return;
                 }
 
-                Optional<ItemStack> poll = chestInventory.query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY
-                        .of(item)).poll(signAmount);
+                Optional<ItemStack> poll = chestInventory
+                        .query(QueryOperationTypes.ITEM_STACK_CUSTOM.of(itemStack -> this.matches(item, itemStack)))
+                        .poll(signAmount);
 
                 if (!poll.isPresent() || poll.get().getQuantity() < signAmount) {
                     player.sendMessage(INSUFFICIENT_ITEMS);
@@ -128,8 +130,9 @@ public class PlayerSignInteractListener {
                     return;
                 }
 
-                Optional<ItemStack> poll = player.getInventory().query(QueryOperationTypes.ITEM_STACK_IGNORE_QUANTITY
-                        .of(item)).poll(signAmount);
+                Optional<ItemStack> poll = player.getInventory()
+                        .query(QueryOperationTypes.ITEM_STACK_CUSTOM.of(itemStack -> this.matches(item, itemStack)))
+                        .poll(signAmount);
 
                 if (!poll.isPresent() || poll.get().getQuantity() < signAmount) {
                     player.sendMessage(YOU_HAVE_INSUFFICIENT_ITEMS);
@@ -157,6 +160,14 @@ public class PlayerSignInteractListener {
                 ownerBank.changeMoney((int) -transactionWorth);
             }
         });
+    }
+
+    private boolean matches(ItemStack one, ItemStack two) {
+        net.minecraft.item.ItemStack nmsOne = ItemStackUtil.toNative(one);
+        net.minecraft.item.ItemStack nmsTwo = ItemStackUtil.toNative(two);
+
+        return Objects.equals(nmsOne.getItem(), nmsTwo.getItem())
+                && Objects.equals(nmsOne.getItemDamage(), nmsTwo.getItemDamage());
     }
 
     private String getOwnerUuid(Location<World> location, EntityPlayerMP player) {
