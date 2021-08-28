@@ -1,7 +1,6 @@
 package com.envyful.chest.shop.sponge;
 
 import com.envyful.api.config.yaml.YamlConfigFactory;
-import com.envyful.api.forge.concurrency.ForgeUpdateBuilder;
 import com.envyful.chest.shop.sponge.config.ChestShopConfig;
 import com.envyful.chest.shop.sponge.listener.PlayerChestOpenListener;
 import com.envyful.chest.shop.sponge.listener.PlayerSignBreakListener;
@@ -38,14 +37,6 @@ public class ChestShopSponge {
         Sponge.getEventManager().registerListeners(this, new PlayerSignBreakListener());
         Sponge.getEventManager().registerListeners(this, new PlayerSignInteractListener(this));
         Sponge.getEventManager().registerListeners(this, new PlayerSignPlaceListener(this));
-
-        ForgeUpdateBuilder.instance()
-                .name("ForgeChestShop")
-                .requiredPermission("forgechestshop.update.notify")
-                .owner("Pixelmon-Development")
-                .repo("ForgeChestShop")
-                .version(VERSION)
-                .start();
     }
 
     private void loadConfig() {
